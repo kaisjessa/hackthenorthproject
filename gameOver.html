@@ -1,0 +1,44 @@
+<html>
+<script src="https://www.gstatic.com/firebasejs/4.3.1/firebase.js"></script>
+<h1> Game Over!</h1>
+
+
+<input id="name" type="text" name="Username" value="john_doe" />
+<input type="submit" value="Submit" onclick="setName()"/>
+
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyCA6Skvl_GCuFi_7x1gnkUd4GZAltnBIwo",
+    authDomain: "kj-hackthenorth.firebaseapp.com",
+    databaseURL: "https://kj-hackthenorth.firebaseio.com",
+    projectId: "kj-hackthenorth",
+    storageBucket: "kj-hackthenorth.appspot.com",
+    messagingSenderId: "292024454192"
+  };
+  firebase.initializeApp(config);
+  console.log(firebase);
+
+  var database = firebase.database();
+  var ref = database.ref('scores');
+  var username = "john_doe";
+
+  function setName() {
+    username = document.getElementById("name").value;
+    console.log(username);
+    submitData();
+  }
+
+  function submitData() {
+      var data = {
+        name: username,
+        score: 55
+      };
+
+      ref.push(data);
+      console.log(data);
+      window.location.replace("index.html");
+  }
+
+</script>
+</html>

@@ -1,6 +1,8 @@
 <html>
+<title>My game</title>
   <head>
   </head>
+  <script src="https://www.gstatic.com/firebasejs/4.3.1/firebase.js"></script>
   <style>
     canvas{
       border: 1px solid rgb(0,255,0);
@@ -48,7 +50,7 @@
       Score = 0
     </p>
     <p id="showScore">
-      Click on green dots to increase your points!
+      Hover over the green dots to increase your points!
     </p>
     <p id="warning">
       Avoid the red dot!
@@ -64,6 +66,7 @@ var enemy = {
   velx: 0,
   vely: 0,
   vel: 0,
+  acc: 0.1,
   speed: 0,
   friction: 0.9
 };
@@ -112,7 +115,8 @@ function checkCollision() {
   for(var i=0; i<coinArray.length;i++) {
     if((Math.abs(coinArray[i][0]-mouse.x) <= coinArray[i][3]*2) && (Math.abs(coinArray[i][1]-mouse.y) <= coinArray[i][3]*2)) {
       score++;
-      enemy.vel = score;
+      enemy.acc = 0.1 + score*0.01;
+    //  enemy.vel = score;
       document.getElementById("showScore").innerHTML = "Score = " + score;
       coinArray[i] = [getRandom(10,width-10),getRandom(10,height-10),10,10];
       break;
@@ -120,10 +124,19 @@ function checkCollision() {
   }
 }
 
+function endGame() {
+  if(((Math.abs(mouse.x-enemy.x))<=10) && ((Math.abs(mouse.y-enemy.y))<=10)) {
+    console.log("game over");
+    saveScore = score;
+    score = 0;
+    window.location.replace("gameOver.html");
+  }
+}
+
 function mousePos(e) {
   mouse.x = e.pageX;
   mouse.y = e.pageY;
-  console.log(mouse.x, mouse.y);
+  //console.log(mouse.x, mouse.y);
   checkCollision();
 }
 
@@ -134,7 +147,7 @@ window.onload=function() {
     var evnt = window.event || e;
     mouse.x = evnt.clientX;
     mouse.y = evnt.clientY;
-    console.log(mouse.x, mouse.y);
+    //console.log(mouse.x, mouse.y);
     if(!start) {
       init();
       start = true;
@@ -145,7 +158,7 @@ window.onload=function() {
 
 
 function moveEnemy() {
-  enemy.speed = 0.5*score;
+  enemy.speed = enemy.acc*score;
 //move right
   if(mouse.x > enemy.x) {
     if(enemy.velx < enemy.speed) {
@@ -176,13 +189,12 @@ function moveEnemy() {
   enemy.vely *= enemy.friction;
   enemy.x += enemy.velx;
   enemy.y += enemy.vely;
-
-  console.log("x: " + enemy.x + " y: " + enemy.y);
 }
 
 function update() {
   requestAnimationFrame(update);
   moveEnemy();
+  endGame();
 
 }
 
