@@ -1,5 +1,5 @@
 <html>
-<title>My game</title>
+<title>Retro Chase</title>
   <head>
   </head>
   <script src="https://www.gstatic.com/firebasejs/4.3.1/firebase.js"></script>
@@ -11,9 +11,11 @@
     }
     body{
       background-color: black;
+      font-family: 'Courier new', 'Courier';
     }
     p{
       color: rgb(0,255,0);
+      font-family: 'Courier new', 'Courier';
     }
     #warning {
       color: rgb(255,0,0);
@@ -28,11 +30,15 @@
     }
     h1 {
       position:fixed;
-      left: 310px;
-      top: 100px;
+      left: 225px;
+      top: 150px;
       font-size: 50px;
       color: rgb(0,255,0);
       z-index: -1;
+      font-family: 'Courier new', 'Courier';
+    }
+    input {
+      font-family: 'Courier new', 'Courier';
     }
 
   </style>
@@ -42,11 +48,14 @@
       Your browser does not support canvas.
     </canvas>
     <h1>
-      Welcome to my game!
+      Welcome to Retro Chase!
     </h1>
     </div>
     <!-- <div id="info">Click to begin</div> -->
     <br />
+    <p>
+      Enter your username:
+    </p>
     <input id="name" type="text" name="Username" value="john_doe" />
     <input type="submit" value="Submit" onclick="setName()"/>
     <p id="showScore">
@@ -95,6 +104,7 @@ coinArray = fillArray(coinArray, 10);
 var keys = [];
 var score = 0;
 var saveScore;
+var start = false;
 var end = false;
 var username = "error";
 var mouse = {
@@ -117,7 +127,9 @@ function setName() {
     username = "john_doe";
   }
   console.log(username);
+  start = true;
   init();
+  update();
 }
 
 function clear() {
@@ -168,10 +180,12 @@ function endGame() {
 }
 
 function mousePos(e) {
-  mouse.x = e.pageX;
-  mouse.y = e.pageY;
-  //console.log(mouse.x, mouse.y);
-  checkCollision();
+  if(start) {
+    mouse.x = e.pageX;
+    mouse.y = e.pageY;
+    //console.log(mouse.x, mouse.y);
+    checkCollision();
+  }
 }
 
 window.onload=function() {
@@ -232,6 +246,20 @@ function moveEnemy() {
   enemy.vely *= enemy.friction;
   enemy.x += enemy.velx;
   enemy.y += enemy.vely;
+  if(enemy.x > width-10) {
+    enemy.x = width-10;
+  }
+  if(enemy.x < 10) {
+    enemy.x = 10;
+  }
+
+  if(enemy.y > height-10) {
+    enemy.y = height-10;
+  }
+
+  if(enemy.y < 10) {
+    enemy.y = 10;
+  }
 }
 
 function update() {
@@ -255,7 +283,7 @@ function draw() {
 
 
 //init();
-update();
+//update();
 // document.body.addEventListener("keydown", function (e) {
 //     keys[e.keyCode] = true;
 // });

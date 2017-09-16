@@ -1,12 +1,14 @@
 <html>
 <script src="https://www.gstatic.com/firebasejs/4.3.1/firebase.js"></script>
 <style>
+
 body{
   background-color: black;
 }
 
 div, p, h1, h2 {
   color: rgb(0,255,0);
+  font-family: 'Courier new', 'Courier';
 }
 
 </style>
@@ -17,7 +19,7 @@ div, p, h1, h2 {
 <body>
 
 <script>
-  // Initialize Firebase
+  // init firebase
   var config = {
     apiKey: "AIzaSyCA6Skvl_GCuFi_7x1gnkUd4GZAltnBIwo",
     authDomain: "kj-hackthenorth.firebaseapp.com",
@@ -26,8 +28,11 @@ div, p, h1, h2 {
     storageBucket: "kj-hackthenorth.appspot.com",
     messagingSenderId: "292024454192"
   };
+
   firebase.initializeApp(config);
   var scorelist = [];
+  var justplayed;
+  var numlist = [];
   var database = firebase.database();
   var printthis = "";
   var ref = database.ref('scores');
@@ -35,28 +40,42 @@ div, p, h1, h2 {
   ref.on('value', gotData, errData);
 
   function gotData(data) {
-    //console.log(data.val());
     var scores = data.val();
-    //console.log(scores);
     var keys = Object.keys(scores);
-    //console.log(keys);
     for(var i = 0; i < keys.length; i++) {
       var k = keys[i];
-      //console.log(k);
       var user = scores[k].name;
       var userscore = scores[k].score;
-    //  console.log(user, userscore);
-      scorelist.push(user + ": " + userscore);
-    //  console.log(scorelist[i]);
+      scorelist.push(userscore + " - " + user);
+      numlist.push(userscore);
     }
-    //console.log(scorelist);
+
+    console.log("orig:" + numlist);
+    justplayed = scorelist[scorelist.length-1];
+
     if(scorelist.length>10) len = 10;
-    else len=scorelist.length;
+    else len = scorelist.length;
+
+    console.log("aeibih: " + scorelist);
+    var collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
+
+    scorelist.sort(collator.compare).reverse();
+
+    var s_numlist = numlist.sort(function(a,b) {
+      return b-a
+    });
+
+    console.log("numlist: " + numlist);
+    console.log("s_numlist: " + s_numlist);
+
+    console.log("scorelist: " + scorelist);
+
     for(var j = 0; j<len; j++) {
       printthis += "<ol>" + scorelist[j] + "</ol>";
+      //printthis += "<ol>" + s_numlist[j] + "</ol>";
     }
     document.getElementById('display').innerHTML = printthis;
-    document.getElementById('yourscore').innerHTML = scorelist[scorelist.length-1];
+    document.getElementById('yourscore').innerHTML = justplayed;
     console.log(printthis);
   }
 
@@ -71,7 +90,7 @@ div, p, h1, h2 {
 
 </div>
 <h2>
-Highscores:
+Top 10 Highscores:
 </h2>
 
 <div id='display'>
