@@ -7,63 +7,23 @@
       : black;
 
     }
-    body{
-      background-color: black;
-    }
-    p{
-      color: rgb(0,255,0);
-    }
-    #warning {
-      color: rgb(255,0,0);
-    }
-    #info {
-      position:fixed;
-      left: 395px;
-      top: 225px;
-      font-size: 50px;
-      color: rgb(0,255,0);
-      z-index: -1;
-    }
-    h1 {
-      position:fixed;
-      left: 310px;
-      top: 100px;
-      font-size: 50px;
-      color: rgb(0,255,0);
-      z-index: -1;
-    }
 
   </style>
   <body>
-    <!-- <h1>Welcome to chase</h1> -->
+    <h1>Welcome to chase</h1>
     <canvas id="canvas" width="1080" height="480">
       Your browser does not support canvas.
     </canvas>
-    <h1>
-      Welcome to my game!
-    </h1>
-    </div>
-    <div id="info">Click to begin</div>
     <p id="showScore">
       Score = 0
     </p>
-    <p id="showScore">
-      Click on green dots to increase your points!
-    </p>
-    <p id="warning">
-      Avoid the red dot!
-    </p>
 
 <script type="text/javascript">
+
 var canvas;
 var ctx;
-var enemy = {
-  x: 50,
-  y: 50,
-  rad: 10,
-  vel: 0,
-  acc: 0
-};
+var x;
+var y;
 var width = 1080;
 var height = 480;
 var coinArray = [];
@@ -74,7 +34,7 @@ var mouse = {
   x: 0,
   y: 0
 };
-var start = false;
+
 function init() {
   canvas = document.getElementById("canvas");
   ctx = canvas.getContext("2d");
@@ -107,7 +67,7 @@ function fillArray(arr, l) {
 
 function checkCollision() {
   for(var i=0; i<coinArray.length;i++) {
-    if((Math.abs(coinArray[i][0]-mouse.x) <= coinArray[i][3]*2) && (Math.abs(coinArray[i][1]-mouse.y) <= coinArray[i][3]*2)) {
+    if((Math.abs((coinArray[i][0]+5)-(mouse.x-5) <= 20) && (Math.abs((coinArray[i][1]+5)-(mouse.y-67)) <= 20))) {
       score++;
       document.getElementById("showScore").innerHTML = "Score = " + score;
       coinArray[i] = [getRandom(10,width-10),getRandom(10,height-10),10,10];
@@ -122,40 +82,26 @@ window.onload=function() {
     mouse.x = evnt.clientX;
     mouse.y = evnt.clientY;
     console.log(mouse.x, mouse.y);
-    if(!start) {
-      init();
-      start = true;
-    }
     checkCollision();
 
   }
 }
 
-function moveEnemy() {
-  enemy.vel = score;
-  enemy.x += enemy.vel;
-}
-
 function update() {
   requestAnimationFrame(update);
-  moveEnemy();
 
 }
 
 function draw() {
   clear();
   ctx.fillStyle = "black";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "rgb(0,255,0)";
   for(var i=0; i<coinArray.length;i++) {
     circle(coinArray[i][0],coinArray[i][1],coinArray[i][2]);
   }
-  ctx.fillStyle = "red";
-  circle(enemy.x, enemy.y, enemy.rad);
 }
 
 
-//init();
+init();
 update();
 // document.body.addEventListener("keydown", function (e) {
 //     keys[e.keyCode] = true;
