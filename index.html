@@ -9,16 +9,21 @@
 
   </style>
   <body>
-    <canvas id="cavas" width="1080" height="480">
+    <canvas id="canvas" width="1080" height="480">
       Your browser does not support canvas.
     </canvas>
 
 <script type="text/javascript">
 
+var canvas;
+var ctx;
 var x;
 var y;
 var width = 1080;
 var height = 480;
+var coinArray = [];
+coinArray = fillArray(coinArray, 10);
+var keys = [];
 
 function init() {
   canvas = document.getElementById("canvas");
@@ -31,15 +36,50 @@ function clear() {
   ctx.clearRect(0,0,width,height);
 }
 
+function circle(x,y,r) {
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI*2, true);
+    ctx.fill();
+}
+
+function getRandom(min, max) {
+  min = Math.ceil(min);
+  max = Math.ceil(max);
+  return Math.floor(Math.random() * (max-min)) + min;
+}
+
+function fillArray(arr, l) {
+  for(var i=0; i<l;i++) {
+    arr[i] = [getRandom(10,width-10),getRandom(10,height-10),10,10];
+  }
+  return arr;
+}
+
+function checkCollision() {
+
+}
+
 function update() {
   requestAnimationFrame(update);
+  canvas.addEventListener("click", checkCollision);
 }
 
 function draw() {
-
+  ctx.fillStyle="black";
+  for(var i=0; i<coinArray.length;i++) {
+    circle(coinArray[i][0],coinArray[i][1],coinArray[i][2]);
+  }
 }
 
 
+init();
+update();
+document.body.addEventListener("keydown", function (e) {
+    keys[e.keyCode] = true;
+});
+document.body.addEventListener("keyup", function (e) {
+    keys[e.keyCode] = false;
+});
 
 </script>
   </body>
