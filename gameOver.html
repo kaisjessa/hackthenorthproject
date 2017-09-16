@@ -1,13 +1,20 @@
 <html>
 <script src="https://www.gstatic.com/firebasejs/4.3.1/firebase.js"></script>
+<style>
+body{
+  background-color: black;
+}
+
+div, p, h1, h2 {
+  color: rgb(0,255,0);
+}
+
+</style>
 <h1> Game Over!</h1>
-<p>
-  <ol id="highscores">
-
-  </ol>
-</p>
 
 
+
+<body>
 
 <script>
   // Initialize Firebase
@@ -20,27 +27,37 @@
     messagingSenderId: "292024454192"
   };
   firebase.initializeApp(config);
-
+  var scorelist = [];
   var database = firebase.database();
+  var printthis = "";
   var ref = database.ref('scores');
+  var len = 0;
   ref.on('value', gotData, errData);
 
   function gotData(data) {
     //console.log(data.val());
     var scores = data.val();
-    console.log(scores);
+    //console.log(scores);
     var keys = Object.keys(scores);
-    console.log(keys);
+    //console.log(keys);
     for(var i = 0; i < keys.length; i++) {
       var k = keys[i];
       //console.log(k);
       var user = scores[k].name;
       var userscore = scores[k].score;
-      console.log(user, userscore);
-
-      var li = document.createElement('li', user + ": " + userscore);
-      document.getElementById('highscores').value = li;
+    //  console.log(user, userscore);
+      scorelist.push(user + ": " + userscore);
+    //  console.log(scorelist[i]);
     }
+    //console.log(scorelist);
+    if(scorelist.length>10) len = 10;
+    else len=scorelist.length;
+    for(var j = 0; j<len; j++) {
+      printthis += "<ol>" + scorelist[j] + "</ol>";
+    }
+    document.getElementById('display').innerHTML = printthis;
+    document.getElementById('yourscore').innerHTML = scorelist[scorelist.length-1];
+    console.log(printthis);
   }
 
   function errData(err) {
@@ -50,4 +67,15 @@
 
 
 </script>
+<div id='yourscore'>
+
+</div>
+<h2>
+Highscores:
+</h2>
+
+<div id='display'>
+
+</div>
+</body>
 </html>
