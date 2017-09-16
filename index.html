@@ -45,7 +45,9 @@
       Welcome to my game!
     </h1>
     </div>
-    <div id="info">Click to begin</div>
+    <!-- <div id="info">Click to begin</div> -->
+    <input id="name" type="text" name="Username" value="john_doe" />
+    <input type="submit" value="Submit" onclick="setName()"/>
     <p id="showScore">
       Score = 0
     </p>
@@ -57,6 +59,21 @@
     </p>
 
 <script type="text/javascript">
+
+var config = {
+  apiKey: "AIzaSyCA6Skvl_GCuFi_7x1gnkUd4GZAltnBIwo",
+  authDomain: "kj-hackthenorth.firebaseapp.com",
+  databaseURL: "https://kj-hackthenorth.firebaseio.com",
+  projectId: "kj-hackthenorth",
+  storageBucket: "kj-hackthenorth.appspot.com",
+  messagingSenderId: "292024454192"
+};
+firebase.initializeApp(config);
+console.log(firebase);
+
+var database = firebase.database();
+var ref = database.ref('scores');
+
 var canvas;
 var ctx;
 var enemy = {
@@ -76,6 +93,9 @@ var coinArray = [];
 coinArray = fillArray(coinArray, 10);
 var keys = [];
 var score = 0;
+var saveScore;
+var end = false;
+var username = "error";
 var mouse = {
   x: 0,
   y: 0
@@ -86,6 +106,17 @@ function init() {
   ctx = canvas.getContext("2d");
   return setInterval(draw, 1);
 
+}
+
+function setName() {
+  if(document.getElementById("name").value != "") {
+    username = document.getElementById("name").value;
+  }
+  else {
+    username = "john_doe";
+  }
+  console.log(username);
+  init();
 }
 
 function clear() {
@@ -115,7 +146,7 @@ function checkCollision() {
   for(var i=0; i<coinArray.length;i++) {
     if((Math.abs(coinArray[i][0]-mouse.x) <= coinArray[i][3]*2) && (Math.abs(coinArray[i][1]-mouse.y) <= coinArray[i][3]*2)) {
       score++;
-      enemy.acc = 0.1 + score*0.01;
+      enemy.acc = 0.1 + score*0.05;
     //  enemy.vel = score;
       document.getElementById("showScore").innerHTML = "Score = " + score;
       coinArray[i] = [getRandom(10,width-10),getRandom(10,height-10),10,10];
@@ -128,8 +159,10 @@ function endGame() {
   if(((Math.abs(mouse.x-enemy.x))<=10) && ((Math.abs(mouse.y-enemy.y))<=10)) {
     console.log("game over");
     saveScore = score;
-    score = 0;
-    window.location.replace("gameOver.html");
+    if(!end) {
+      submitData();
+      end = true;
+    }
   }
 }
 
@@ -148,13 +181,22 @@ window.onload=function() {
     mouse.x = evnt.clientX;
     mouse.y = evnt.clientY;
     //console.log(mouse.x, mouse.y);
-    if(!start) {
-      init();
-      start = true;
-    }
 
   }
 }
+
+
+function submitData() {
+    var data = {
+      name: username,
+      score: saveScore
+    };
+
+    ref.push(data);
+    console.log(data);
+    window.location.replace("gameOver.html");
+}
+
 
 
 function moveEnemy() {

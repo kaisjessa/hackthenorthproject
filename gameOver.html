@@ -1,10 +1,13 @@
 <html>
 <script src="https://www.gstatic.com/firebasejs/4.3.1/firebase.js"></script>
 <h1> Game Over!</h1>
+<p>
+  <ol id="highscores">
+
+  </ol>
+</p>
 
 
-<input id="name" type="text" name="Username" value="john_doe" />
-<input type="submit" value="Submit" onclick="setName()"/>
 
 <script>
   // Initialize Firebase
@@ -17,28 +20,34 @@
     messagingSenderId: "292024454192"
   };
   firebase.initializeApp(config);
-  console.log(firebase);
 
   var database = firebase.database();
   var ref = database.ref('scores');
-  var username = "john_doe";
+  ref.on('value', gotData, errData);
 
-  function setName() {
-    username = document.getElementById("name").value;
-    console.log(username);
-    submitData();
+  function gotData(data) {
+    //console.log(data.val());
+    var scores = data.val();
+    console.log(scores);
+    var keys = Object.keys(scores);
+    console.log(keys);
+    for(var i = 0; i < keys.length; i++) {
+      var k = keys[i];
+      //console.log(k);
+      var user = scores[k].name;
+      var userscore = scores[k].score;
+      console.log(user, userscore);
+
+      var li = document.createElement('li', user + ": " + userscore);
+      document.getElementById('highscores').value = li;
+    }
   }
 
-  function submitData() {
-      var data = {
-        name: username,
-        score: 55
-      };
-
-      ref.push(data);
-      console.log(data);
-      window.location.replace("index.html");
+  function errData(err) {
+    console.log('Error!');
+    console.log(err);
   }
+
 
 </script>
 </html>
