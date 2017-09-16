@@ -12,6 +12,9 @@
     <canvas id="canvas" width="1080" height="480">
       Your browser does not support canvas.
     </canvas>
+    <p id="showScore">
+      Score = 0
+    </p>
 
 <script type="text/javascript">
 
@@ -24,6 +27,11 @@ var height = 480;
 var coinArray = [];
 coinArray = fillArray(coinArray, 10);
 var keys = [];
+var score = 0;
+var mouse = {
+  x: 0,
+  y: 0
+};
 
 function init() {
   canvas = document.getElementById("canvas");
@@ -56,15 +64,32 @@ function fillArray(arr, l) {
 }
 
 function checkCollision() {
+  for(var i=0; i<coinArray.length;i++) {
+    if((Math.abs(coinArray[i][0]-mouse.x) <= coinArray[i][3]*2) && (Math.abs(coinArray[i][1]-mouse.y) <= coinArray[i][3]*2)) {
+      score++;
+      document.getElementById("showScore").innerHTML = "Score = " + score;
+      coinArray[i] = [getRandom(10,width-10),getRandom(10,height-10),10,10];
+    }
+  }
+}
 
+window.onload=function() {
+  window.onclick=function(e) {
+    var evnt = window.event || e;
+    mouse.x = evnt.clientX;
+    mouse.y = evnt.clientY;
+    console.log(mouse.x, mouse.y);
+    canvas.addEventListener("click", checkCollision);
+  }
 }
 
 function update() {
   requestAnimationFrame(update);
-  canvas.addEventListener("click", checkCollision);
+
 }
 
 function draw() {
+  clear();
   ctx.fillStyle="black";
   for(var i=0; i<coinArray.length;i++) {
     circle(coinArray[i][0],coinArray[i][1],coinArray[i][2]);
@@ -74,12 +99,13 @@ function draw() {
 
 init();
 update();
-document.body.addEventListener("keydown", function (e) {
-    keys[e.keyCode] = true;
-});
-document.body.addEventListener("keyup", function (e) {
-    keys[e.keyCode] = false;
-});
+// document.body.addEventListener("keydown", function (e) {
+//     keys[e.keyCode] = true;
+// });
+// document.body.addEventListener("keyup", function (e) {
+//     keys[e.keyCode] = false;
+// });
+
 
 </script>
   </body>
