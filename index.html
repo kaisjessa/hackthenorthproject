@@ -92,10 +92,10 @@ var enemy = {
   rad: 10,
   velx: 0,
   vely: 0,
-  vel: 0,
   acc: 0.1,
   speed: 0,
-  friction: 0.9
+  friction: 0.9,
+  add: 0.5
 };
 var width = 1080;
 var height = 480;
@@ -112,6 +112,7 @@ var mouse = {
   y: 0
 };
 var start = false;
+
 function init() {
   canvas = document.getElementById("canvas");
   ctx = canvas.getContext("2d");
@@ -159,7 +160,8 @@ function checkCollision() {
   for(var i=0; i<coinArray.length;i++) {
     if((Math.abs(coinArray[i][0]-mouse.x) <= coinArray[i][3]*2) && (Math.abs(coinArray[i][1]-mouse.y) <= coinArray[i][3]*2)) {
       score++;
-      enemy.acc = 0.1 + score*0.05;
+      enemy.acc += score*0.05;
+      enemy.add += score*0.001;
     //  enemy.vel = score;
       document.getElementById("showScore").innerHTML = "Score = " + score;
       coinArray[i] = [getRandom(10,width-10),getRandom(10,height-10),10,10];
@@ -219,26 +221,26 @@ function moveEnemy() {
 //move right
   if(mouse.x > enemy.x) {
     if(enemy.velx < enemy.speed) {
-      enemy.velx++;
+      enemy.velx += enemy.add;
     }
   }
   //move left
   if(mouse.x < enemy.x) {
     if(enemy.velx > -enemy.speed) {
-      enemy.velx--;
+      enemy.velx -= enemy.add;
     }
   }
   //move down
   if(mouse.y > enemy.y) {
     if(enemy.vely < enemy.speed) {
-      enemy.vely++;
+      enemy.vely += enemy.add;
 
     }
   }
   //move up
   if(mouse.y < enemy.y) {
     if(enemy.vely > -enemy.speed) {
-      enemy.vely--;
+      enemy.vely -= enemy.add;
     }
   }
 

@@ -32,7 +32,6 @@ div, p, h1, h2 {
   firebase.initializeApp(config);
   var scorelist = [];
   var justplayed;
-  var numlist = [];
   var database = firebase.database();
   var printthis = "";
   var ref = database.ref('scores');
@@ -47,36 +46,24 @@ div, p, h1, h2 {
       var user = scores[k].name;
       var userscore = scores[k].score;
       scorelist.push(userscore + " - " + user);
-      numlist.push(userscore);
     }
 
-    console.log("orig:" + numlist);
     justplayed = scorelist[scorelist.length-1];
 
     if(scorelist.length>10) len = 10;
     else len = scorelist.length;
 
-    console.log("aeibih: " + scorelist);
     var collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
 
     scorelist.sort(collator.compare).reverse();
 
-    var s_numlist = numlist.sort(function(a,b) {
-      return b-a
-    });
-
-    console.log("numlist: " + numlist);
-    console.log("s_numlist: " + s_numlist);
-
-    console.log("scorelist: " + scorelist);
-
     for(var j = 0; j<len; j++) {
       printthis += "<ol>" + scorelist[j] + "</ol>";
-      //printthis += "<ol>" + s_numlist[j] + "</ol>";
     }
-    document.getElementById('display').innerHTML = printthis;
+
     document.getElementById('yourscore').innerHTML = justplayed;
-    console.log(printthis);
+    document.getElementById('display').innerHTML = printthis;
+
   }
 
   function errData(err) {
