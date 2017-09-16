@@ -116,7 +116,15 @@ function checkCollision() {
   }
 }
 
+function mousePos(e) {
+  mouse.x = e.pageX;
+  mouse.y = e.pageY;
+  console.log(mouse.x, mouse.y);
+}
+
 window.onload=function() {
+  document.captureEvents(Event.MOUSEMOVE);
+  document.onmousemove = function (e) {mousePos(e);};
   window.onclick=function(e) {
     var evnt = window.event || e;
     mouse.x = evnt.clientX;
@@ -130,6 +138,8 @@ window.onload=function() {
 
   }
 }
+
+
 
 function moveEnemy() {
   enemy.vel = score;
