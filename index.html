@@ -1,0 +1,48 @@
+<html>
+  <head>
+  </head>
+  <style>
+    canvas{
+      border: 1px solid;
+
+    }
+
+  </style>
+  <body>
+    <canvas id="cavas" width="1080" height="480">
+      Your browser does not support canvas.
+    </canvas>
+
+<script type="text/javascript">
+
+var x;
+var y;
+var width = 1080;
+var height = 480;
+
+function init() {
+  canvas = document.getElementById("canvas");
+  ctx = canvas.getContext("2d");
+  return setInterval(draw, 1);
+
+}
+
+function clear() {
+  ctx.clearRect(0,0,width,height);
+}
+
+function update() {
+  requestAnimationFrame(update);
+}
+
+function draw() {
+
+}
+
+
+
+</script>
+  </body>
+
+
+</html>
