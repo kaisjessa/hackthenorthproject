@@ -39,6 +39,16 @@
     }
     input {
       font-family: 'Courier new', 'Courier';
+      font-size: 15px;
+      color: rgb(0,255,0);
+      background-color: black;
+      border: 1px solid rgb(0,255,0);
+    }
+
+    form {
+      font-family: 'Courier new', 'Courier';
+      color: rgb(0,255,0);
+      background: black;
     }
 
   </style>
@@ -56,8 +66,11 @@
     <p>
       Enter your username:
     </p>
-    <input id="name" type="text" name="Username" value="john_doe" />
-    <input type="submit" value="Submit" onclick="setName()"/>
+    <form action="javascript:setName()">
+      <input id="name" type="text" name="Username" value="john_doe" />
+      <input type="submit" value="Submit" onclick="setName()"/>
+    </form>
+
     <p id="showScore">
       Score = 0
     </p>
@@ -65,7 +78,10 @@
       Hover over the green dots to increase your points!
     </p>
     <p id="warning">
-      Avoid the red dot!
+      Avoid the red dot + don't let it eat up the green ones!
+    </p>
+    <p id="greencount">
+      # of green dots left: 10
     </p>
 
 <script type="text/javascript">
@@ -99,6 +115,8 @@ var enemy = {
 };
 var width = 1080;
 var height = 480;
+var acc2;
+var offscreen = false;
 var coinArray = [];
 coinArray = fillArray(coinArray, 10);
 var keys = [];
@@ -116,7 +134,7 @@ var start = false;
 function init() {
   canvas = document.getElementById("canvas");
   ctx = canvas.getContext("2d");
-  return setInterval(draw, 1);
+  return setInterval(draw, 1000/60);
 
 }
 
@@ -160,9 +178,11 @@ function checkCollision() {
   for(var i=0; i<coinArray.length;i++) {
     if((Math.abs(coinArray[i][0]-mouse.x) <= coinArray[i][3]*2) && (Math.abs(coinArray[i][1]-mouse.y) <= coinArray[i][3]*2)) {
       score++;
-      enemy.acc += score*0.05;
+      enemy.acc += score*0.025;
       enemy.add += score*0.001;
-    //  enemy.vel = score;
+      acc2 = enemy.acc;
+      enemy.rad += score*0.05;
+      if(enemy.rad >= height/4) enemy.rad = height;
       document.getElementById("showScore").innerHTML = "Score = " + score;
       coinArray[i] = [getRandom(10,width-10),getRandom(10,height-10),10,10];
       break;
@@ -170,14 +190,29 @@ function checkCollision() {
   }
 }
 
-function endGame() {
-  if(((Math.abs(mouse.x-enemy.x))<=10) && ((Math.abs(mouse.y-enemy.y))<=10)) {
-    console.log("game over");
-    saveScore = score;
-    if(!end) {
-      submitData();
-      end = true;
+function redCollide() {
+  for(var i=0; i<coinArray.length;i++) {
+    if((Math.abs(coinArray[i][0]-enemy.x) <= enemy.rad) && (Math.abs(coinArray[i][1]-enemy.y) <= enemy.rad)) {
+      coinArray.splice(i,1);
     }
+  }
+  document.getElementById('greencount').innerHTML = "# of green dots left: " + coinArray.length;
+  if(coinArray.length == 0) endGame();
+}
+
+function checkEndGame() {
+  if(((Math.abs(mouse.x-enemy.x))<=enemy.rad) && ((Math.abs(mouse.y-enemy.y))<=enemy.rad)) {
+      endGame();
+    }
+  }
+
+
+function endGame() {
+  console.log("game over");
+  saveScore = score;
+  if(!end) {
+    submitData();
+    end = true;
   }
 }
 
@@ -187,6 +222,7 @@ function mousePos(e) {
     mouse.y = e.pageY;
     //console.log(mouse.x, mouse.y);
     checkCollision();
+    redCollide();
   }
 }
 
@@ -217,8 +253,23 @@ function submitData() {
 
 
 function moveEnemy() {
+  setTimeout(1000);
+
+  if(!offscreen && (mouse.x > width || mouse.y > height)) {
+    offscreen = true;
+    acc2 = enemy.acc;
+    enemy.acc = 0;
+
+  }
+
+  if(offscreen && (mouse.x < width && mouse.y < height)) {
+    offscreen = false;
+    enemy.acc = acc2;
+  }
+
   enemy.speed = enemy.acc*score;
-//move right
+
+  //move right
   if(mouse.x > enemy.x) {
     if(enemy.velx < enemy.speed) {
       enemy.velx += enemy.add;
@@ -248,26 +299,31 @@ function moveEnemy() {
   enemy.vely *= enemy.friction;
   enemy.x += enemy.velx;
   enemy.y += enemy.vely;
+
   if(enemy.x > width-10) {
     enemy.x = width-10;
+    enemy.velx *= -enemy.friction;
   }
   if(enemy.x < 10) {
     enemy.x = 10;
+    enemy.velx *= -enemy.friction;
   }
 
   if(enemy.y > height-10) {
     enemy.y = height-10;
+    enemy.vely *= -enemy.friction;
   }
 
   if(enemy.y < 10) {
     enemy.y = 10;
+    enemy.vely *= -enemy.friction;
   }
 }
 
 function update() {
   requestAnimationFrame(update);
   moveEnemy();
-  endGame();
+  checkEndGame();
 
 }
 
