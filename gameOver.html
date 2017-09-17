@@ -46,14 +46,23 @@ form {
   };
 
   firebase.initializeApp(config);
+
+  //declare variables
   var scorelist = [];
+  //check most recent username and score to display separately
   var justplayed;
+  //variable for sound file when page loads
   var lose_sound = new Audio('sounds/lose.wav');
+  //database variable
   var database = firebase.database();
+  //top 10 high scores to be shown in HTML
   var printthis = "";
+
   var ref = database.ref('scores');
+  //# of highscores to be shows
   var len = 0;
   ref.on('value', gotData, errData);
+
 
   function gotData(data) {
     var scores = data.val();
@@ -62,22 +71,29 @@ form {
       var k = keys[i];
       var user = scores[k].name;
       var userscore = scores[k].score;
+      //save usernames and scores in scorelist
       scorelist.push(userscore + " - " + user);
     }
 
+    //set most recent player to last element in scorelist
     justplayed = scorelist[scorelist.length-1];
 
+    //displays a maximum of 10 highscores
     if(scorelist.length>10) len = 10;
     else len = scorelist.length;
 
     var collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
 
+    //sort scorelist numerically descending
     scorelist.sort(collator.compare).reverse();
 
+    //set variable equal to top highscores with ordered list HTML tags
     for(var j = 0; j<len; j++) {
       printthis += "<ol>" + scorelist[j] + "</ol>";
     }
 
+
+    //display most recent score and highscore
     document.getElementById('yourscore').innerHTML = justplayed;
     document.getElementById('display').innerHTML = printthis;
 
@@ -88,7 +104,7 @@ form {
     console.log(err);
   }
 
-
+//play sound when page loads
 lose_sound.play();
 </script>
 <div id='yourscore'>

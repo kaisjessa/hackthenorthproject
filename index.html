@@ -54,7 +54,6 @@
 
   </style>
   <body>
-    <!-- <h1>Welcome to chase</h1> -->
     <canvas id="canvas" width="1080" height="480">
       Your browser does not support canvas.
     </canvas>
@@ -62,7 +61,6 @@
       Welcome to retro_chase!
     </h1>
     </div>
-    <!-- <div id="info">Click to begin</div> -->
     <br />
     <p>
       Enter your username:
@@ -88,6 +86,7 @@
 
 <script type="text/javascript">
 
+//set-up and init firebase
 var config = {
   apiKey: "AIzaSyCA6Skvl_GCuFi_7x1gnkUd4GZAltnBIwo",
   authDomain: "kj-hackthenorth.firebaseapp.com",
@@ -96,23 +95,24 @@ var config = {
   storageBucket: "kj-hackthenorth.appspot.com",
   messagingSenderId: "292024454192"
 };
+
 firebase.initializeApp(config);
-console.log(firebase);
+//console.log(firebase);
 
 var database = firebase.database();
 var ref = database.ref('scores');
 ref.on('value', gotData, errData);
 
+//fill the form with the last-used username so player doesn't need to retype
 function gotData(data) {
   var scores = data.val();
   var keys = Object.keys(scores);
   var k = keys[keys.length-1];
   var lastuser = scores[k].name;
-  console.log(lastuser);
+  //console.log(lastuser);
   if(lastuser != undefined) {
     document.getElementById('name').value = lastuser;
-}
-
+  }
 }
 
 function errData(err) {
@@ -120,8 +120,10 @@ function errData(err) {
   console.log(err);
 }
 
+//declare variables
 var canvas;
 var ctx;
+//enemy object
 var enemy = {
   x: 50,
   y: 50,
@@ -133,29 +135,34 @@ var enemy = {
   friction: 0.9,
   add: 0.5
 };
+//canvas w and h
 var width = 1080;
 var height = 480;
+//audio files
 var coin_audio = new Audio('sounds/coinlong.wav');
 var coin1 = false;
 var coin_audio2 = new Audio('sounds/coinlong.wav');
 var coin2 = false;
 var red_sound = new Audio('sounds/red.wav');
-var offscreen = false;
+var start_sound = new Audio('sounds/start.wav');
+//fill array with 10 randomly placed circles
 var coinArray = [];
 coinArray = fillArray(coinArray, 10);
-var keys = [];
 var score = 0;
 var saveScore;
-var start_sound = new Audio('sounds/start.wav');
+//circles don't draw until game==true (when username is submitted)
 var start = false;
+//end=true when game ends to prevent mutiple data submissions
 var end = false;
+//username=="error" if name submission doesn't work
 var username = "error";
+//x and y coordinates of the cursor
 var mouse = {
   x: 0,
   y: 0
 };
-var start = false;
 
+//init
 function init() {
   canvas = document.getElementById("canvas");
   ctx = canvas.getContext("2d");
@@ -163,6 +170,7 @@ function init() {
 
 }
 
+//set username of player
 function setName() {
   if(document.getElementById("name").value != "") {
     username = document.getElementById("name").value;
@@ -171,29 +179,33 @@ function setName() {
     username = "john_doe";
   }
   document.getElementById("name").value = username;
-  console.log(username);
+  //console.log(username);
   start = true;
   init();
   update();
   start_sound.play();
 }
 
+//clear the canvas
 function clear() {
   ctx.clearRect(0,0,width,height);
 }
 
+//draw a circle
 function circle(x,y,r) {
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI*2, true);
     ctx.fill();
 }
 
+//create a random integer
 function getRandom(min, max) {
   min = Math.ceil(min);
   max = Math.ceil(max);
   return Math.floor(Math.random() * (max-min)) + min;
 }
 
+//function to fill coinArray with circles
 function fillArray(arr, l) {
   for(var i=0; i<l;i++) {
     arr[i] = [getRandom(10,width-10),getRandom(10,height-10),10,10];
@@ -201,10 +213,13 @@ function fillArray(arr, l) {
   return arr;
 }
 
+//check if cursor collides with a circle
 function checkCollision() {
   for(var i=0; i<coinArray.length;i++) {
     if((Math.abs(coinArray[i][0]-mouse.x) <= coinArray[i][3]*2) && (Math.abs(coinArray[i][1]-mouse.y) <= coinArray[i][3]*2)) {
+      //increase score
       score++;
+      //play sound
       if(!coin1) {
         coin1 = true;
         coin_audio.play();
@@ -216,16 +231,21 @@ function checkCollision() {
         coin1 = false;
       }
 
+      //increase acceleration and rate at which maximum speed increases
       enemy.acc += score*0.00005;
       enemy.add += score*0.0005;
+      //keep red circle's radius less than 1/4 the height of the canvas
       if(enemy.rad >= height/4) enemy.rad = height;
+      //update score in HTML
       document.getElementById("showScore").innerHTML = "Score = " + score;
+      //randomly re-locate circle inside of canvas
       coinArray[i] = [getRandom(10,width-10),getRandom(10,height-10),10,10];
       break;
     }
   }
 }
 
+//check if red collides with a circle
 function redCollide() {
   var a;
   var x;
@@ -234,24 +254,28 @@ function redCollide() {
     a = enemy.rad + coinArray[i][3];
     x = coinArray[i][0]-enemy.x;
     y = coinArray[i][1]-enemy.y;
-    //if((Math.abs(coinArray[i][0]+coinArray[i][3]-(enemy.x+enemy.rad)) <= enemy.rad) && (Math.abs(coinArray[i][1]+coinArray[i][3]-(enemy.y+enemy.rad)) <= enemy.rad)) {
-      if(a*a > ((x*x) + (y*y))) {
-        coinArray.splice(i,1);
-        enemy.rad += 5;
-        red_sound.play();
+    if(a*a > ((x*x) + (y*y))) {
+      //if they do collide, remove the green circle from the array
+      coinArray.splice(i,1);
+      //make the red circle bigger
+      enemy.rad += 5;
+      red_sound.play();
     }
   }
+  //update # of circles left in HTML
   document.getElementById('greencount').innerHTML = "# of green dots left: " + coinArray.length;
+  //if no green circles left, end game
   if(coinArray.length == 0) endGame();
 }
 
+//check if cursor collides with red circle
 function checkEndGame() {
   if(((Math.abs(mouse.x-enemy.x))<=enemy.rad) && ((Math.abs(mouse.y-enemy.y))<=enemy.rad)) {
       endGame();
     }
   }
 
-
+//end the game and submit the username and score to firebase database
 function endGame() {
   saveScore = score;
   if(!end) {
@@ -260,15 +284,18 @@ function endGame() {
   }
 }
 
+//track mouse position
 function mousePos(e) {
   if(start) {
     mouse.x = e.pageX;
     mouse.y = e.pageY;
+    //check collisions
     checkCollision();
     redCollide();
   }
 }
 
+//check mouse pressed and mouse position
 window.onload=function() {
   document.captureEvents(Event.MOUSEMOVE);
   document.onmousemove = function (e) {mousePos(e);};
@@ -280,7 +307,7 @@ window.onload=function() {
   }
 }
 
-
+//submit data to firebase database
 function submitData() {
     var data = {
       name: username.substring(0,20),
@@ -288,24 +315,22 @@ function submitData() {
     };
 
     ref.push(data);
-    console.log(data);
+    //console.log(data);
     window.location.replace("gameOver.html");
 }
 
 
-
+//move enemy based on curcor position
 function moveEnemy() {
   setTimeout(1000);
+  //increase max speed based on score
   enemy.speed = enemy.acc*score;
 
+  //red stops moving if cursor is outside canvas
+  if((mouse.x > width || mouse.y > height)) {
+    enemy.speed = 0;
 
-    if((mouse.x > width || mouse.y > height)) {
-      //offscreen = true;
-      enemy.speed = 0;
-    //  enemy.velx = 0;
-    //  enemy.vely = 0;
-
-    }
+  }
 
   //move right
   if(mouse.x > enemy.x) {
@@ -313,12 +338,14 @@ function moveEnemy() {
       enemy.velx += enemy.add;
     }
   }
+
   //move left
   if(mouse.x < enemy.x) {
     if(enemy.velx > -enemy.speed) {
       enemy.velx -= enemy.add;
     }
   }
+
   //move down
   if(mouse.y > enemy.y) {
     if(enemy.vely < enemy.speed) {
@@ -326,6 +353,7 @@ function moveEnemy() {
 
     }
   }
+
   //move up
   if(mouse.y < enemy.y) {
     if(enemy.vely > -enemy.speed) {
@@ -333,11 +361,14 @@ function moveEnemy() {
     }
   }
 
+  //apply friction for smooth movement
   enemy.velx *= enemy.friction;
   enemy.vely *= enemy.friction;
+  //update enemy x and y positions with velocities
   enemy.x += enemy.velx;
   enemy.y += enemy.vely;
 
+  //keep enemy within the canvas
   if(enemy.x > width-10) {
     enemy.x = width-10;
     enemy.velx *= -enemy.friction;
@@ -358,6 +389,7 @@ function moveEnemy() {
   }
 }
 
+//update to move enemy and check if mouse collides with enemy
 function update() {
   requestAnimationFrame(update);
   moveEnemy();
@@ -365,6 +397,7 @@ function update() {
 
 }
 
+//draw circles and enemy
 function draw() {
   clear();
   ctx.fillStyle = "black";
@@ -376,17 +409,6 @@ function draw() {
   ctx.fillStyle = "red";
   circle(enemy.x, enemy.y, enemy.rad);
 }
-
-
-//init();
-//update();
-// document.body.addEventListener("keydown", function (e) {
-//     keys[e.keyCode] = true;
-// });
-// document.body.addEventListener("keyup", function (e) {
-//     keys[e.keyCode] = false;
-// });
-
 
 </script>
   </body>
