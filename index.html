@@ -1,5 +1,6 @@
 <html>
-<title>Retro Chase</title>
+<title>retro_chase</title>
+<link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Ski_trail_rating_symbol-green_circle.svg/240px-Ski_trail_rating_symbol-green_circle.svg.png">
   <head>
   </head>
   <script src="https://www.gstatic.com/firebasejs/4.3.1/firebase.js"></script>
@@ -58,7 +59,7 @@
       Your browser does not support canvas.
     </canvas>
     <h1>
-      Welcome to Retro Chase!
+      Welcome to retro_chase!
     </h1>
     </div>
     <!-- <div id="info">Click to begin</div> -->
@@ -67,9 +68,10 @@
       Enter your username:
     </p>
     <form action="javascript:setName()">
-      <input id="name" type="text" name="Username" value="john_doe" />
+      <input id="name" type="text" name="Username" value="" autofocus/>
       <input type="submit" value="Submit" onclick="setName()"/>
     </form>
+
 
     <p id="showScore">
       Score = 0
@@ -145,6 +147,7 @@ function setName() {
   else {
     username = "john_doe";
   }
+  document.getElementById("name").value = username;
   console.log(username);
   start = true;
   init();
@@ -178,8 +181,8 @@ function checkCollision() {
   for(var i=0; i<coinArray.length;i++) {
     if((Math.abs(coinArray[i][0]-mouse.x) <= coinArray[i][3]*2) && (Math.abs(coinArray[i][1]-mouse.y) <= coinArray[i][3]*2)) {
       score++;
-      enemy.acc += score*0.025;
-      enemy.add += score*0.001;
+      enemy.acc += score*0.00005;
+      enemy.add += score*0.0005;
       acc2 = enemy.acc;
       if(enemy.rad >= height/4) enemy.rad = height;
       document.getElementById("showScore").innerHTML = "Score = " + score;
