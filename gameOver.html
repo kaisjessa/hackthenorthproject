@@ -48,6 +48,7 @@ form {
   firebase.initializeApp(config);
   var scorelist = [];
   var justplayed;
+  var lose_sound = new Audio('sounds/lose.wav');
   var database = firebase.database();
   var printthis = "";
   var ref = database.ref('scores');
@@ -88,6 +89,7 @@ form {
   }
 
 
+lose_sound.play();
 </script>
 <div id='yourscore'>
 

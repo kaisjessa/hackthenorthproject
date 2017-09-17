@@ -117,13 +117,18 @@ var enemy = {
 };
 var width = 1080;
 var height = 480;
-var acc2;
+var coin_audio = new Audio('sounds/coinlong.wav');
+var coin1 = false;
+var coin_audio2 = new Audio('sounds/coinlong.wav');
+var coin2 = false;
+var red_sound = new Audio('sounds/red.wav');
 var offscreen = false;
 var coinArray = [];
 coinArray = fillArray(coinArray, 10);
 var keys = [];
 var score = 0;
 var saveScore;
+var start_sound = new Audio('sounds/start.wav');
 var start = false;
 var end = false;
 var username = "error";
@@ -152,6 +157,7 @@ function setName() {
   start = true;
   init();
   update();
+  start_sound.play();
 }
 
 function clear() {
@@ -181,9 +187,19 @@ function checkCollision() {
   for(var i=0; i<coinArray.length;i++) {
     if((Math.abs(coinArray[i][0]-mouse.x) <= coinArray[i][3]*2) && (Math.abs(coinArray[i][1]-mouse.y) <= coinArray[i][3]*2)) {
       score++;
+      if(!coin1) {
+        coin1 = true;
+        coin_audio.play();
+        coin2 = false;
+      }
+      else if(!coin2) {
+        coin2 = true;
+        coin_audio2.play();
+        coin1 = false;
+      }
+
       enemy.acc += score*0.00005;
       enemy.add += score*0.0005;
-      acc2 = enemy.acc;
       if(enemy.rad >= height/4) enemy.rad = height;
       document.getElementById("showScore").innerHTML = "Score = " + score;
       coinArray[i] = [getRandom(10,width-10),getRandom(10,height-10),10,10];
@@ -204,6 +220,7 @@ function redCollide() {
       if(a*a > ((x*x) + (y*y))) {
         coinArray.splice(i,1);
         enemy.rad += 5;
+        red_sound.play();
     }
   }
   document.getElementById('greencount').innerHTML = "# of green dots left: " + coinArray.length;
@@ -264,20 +281,16 @@ function submitData() {
 
 function moveEnemy() {
   setTimeout(1000);
-
-  if(!offscreen && (mouse.x > width || mouse.y > height)) {
-    offscreen = true;
-    acc2 = enemy.acc;
-    enemy.acc = 0;
-
-  }
-
-  if(offscreen && (mouse.x < width && mouse.y < height)) {
-    offscreen = false;
-    enemy.acc = acc2;
-  }
-
   enemy.speed = enemy.acc*score;
+
+
+    if((mouse.x > width || mouse.y > height)) {
+      //offscreen = true;
+      enemy.speed = 0;
+    //  enemy.velx = 0;
+    //  enemy.vely = 0;
+
+    }
 
   //move right
   if(mouse.x > enemy.x) {
