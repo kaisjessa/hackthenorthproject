@@ -283,7 +283,7 @@ window.onload=function() {
 
 function submitData() {
     var data = {
-      name: username,
+      name: username.substring(0,20),
       score: saveScore
     };
 
