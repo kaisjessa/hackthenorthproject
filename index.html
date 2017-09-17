@@ -235,7 +235,6 @@ function checkEndGame() {
 
 
 function endGame() {
-  console.log("game over");
   saveScore = score;
   if(!end) {
     submitData();
@@ -247,7 +246,6 @@ function mousePos(e) {
   if(start) {
     mouse.x = e.pageX;
     mouse.y = e.pageY;
-    //console.log(mouse.x, mouse.y);
     checkCollision();
     redCollide();
   }
@@ -260,7 +258,6 @@ window.onload=function() {
     var evnt = window.event || e;
     mouse.x = evnt.clientX;
     mouse.y = evnt.clientY;
-    //console.log(mouse.x, mouse.y);
 
   }
 }
