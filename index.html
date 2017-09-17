@@ -101,6 +101,24 @@ console.log(firebase);
 
 var database = firebase.database();
 var ref = database.ref('scores');
+ref.on('value', gotData, errData);
+
+function gotData(data) {
+  var scores = data.val();
+  var keys = Object.keys(scores);
+  var k = keys[keys.length-1];
+  var lastuser = scores[k].name;
+  console.log(lastuser);
+  if(lastuser != undefined) {
+    document.getElementById('name').value = lastuser;
+}
+
+}
+
+function errData(err) {
+  console.log('Error!');
+  console.log(err);
+}
 
 var canvas;
 var ctx;
