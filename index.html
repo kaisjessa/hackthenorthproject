@@ -181,7 +181,6 @@ function checkCollision() {
       enemy.acc += score*0.025;
       enemy.add += score*0.001;
       acc2 = enemy.acc;
-      enemy.rad += score*0.05;
       if(enemy.rad >= height/4) enemy.rad = height;
       document.getElementById("showScore").innerHTML = "Score = " + score;
       coinArray[i] = [getRandom(10,width-10),getRandom(10,height-10),10,10];
@@ -191,9 +190,17 @@ function checkCollision() {
 }
 
 function redCollide() {
+  var a;
+  var x;
+  var y;
   for(var i=0; i<coinArray.length;i++) {
-    if((Math.abs(coinArray[i][0]-enemy.x) <= enemy.rad) && (Math.abs(coinArray[i][1]-enemy.y) <= enemy.rad)) {
-      coinArray.splice(i,1);
+    a = enemy.rad + coinArray[i][3];
+    x = coinArray[i][0]-enemy.x;
+    y = coinArray[i][1]-enemy.y;
+    //if((Math.abs(coinArray[i][0]+coinArray[i][3]-(enemy.x+enemy.rad)) <= enemy.rad) && (Math.abs(coinArray[i][1]+coinArray[i][3]-(enemy.y+enemy.rad)) <= enemy.rad)) {
+      if(a*a > ((x*x) + (y*y))) {
+        coinArray.splice(i,1);
+        enemy.rad += 5;
     }
   }
   document.getElementById('greencount').innerHTML = "# of green dots left: " + coinArray.length;
