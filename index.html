@@ -105,14 +105,14 @@ ref.on('value', gotData, errData);
 
 //fill the form with the last-used username so player doesn't need to retype
 function gotData(data) {
-  var scores = data.val();
-  var keys = Object.keys(scores);
-  var k = keys[keys.length-1];
-  var lastuser = scores[k].name;
-  //console.log(lastuser);
-  if(lastuser != undefined) {
-    document.getElementById('name').value = lastuser;
-  }
+  // var scores = data.val();
+  // var keys = Object.keys(scores);
+  // var k = keys[keys.length-1];
+  // var lastuser = scores[k].name;
+  // console.log(lastuser);
+  // if(lastuser != undefined) {
+  //   document.getElementById('name').value = lastuser;
+  // }
 }
 
 function errData(err) {

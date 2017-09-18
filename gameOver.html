@@ -57,7 +57,7 @@ form {
   var database = firebase.database();
   //top 10 high scores to be shown in HTML
   var printthis = "";
-
+  var del = false;
   var ref = database.ref('scores');
   //# of highscores to be shows
   var len = 0;
@@ -65,8 +65,10 @@ form {
 
 
   function gotData(data) {
-    var scores = data.val();
-    var keys = Object.keys(scores);
+    scorelist = [];
+    printthis = "";
+    window.scores = data.val();
+    window.keys = Object.keys(scores);
     for(var i = 0; i < keys.length; i++) {
       var k = keys[i];
       var user = scores[k].name;
@@ -104,6 +106,22 @@ form {
     console.log(err);
   }
 
+  function newPage() {
+    if(!del) {
+      del = true;
+      var tenHighScore = parseInt(scorelist[9]);
+      console.log("10 high score: " + tenHighScore);
+      for(var j=0; j<keys.length; j++) {
+        var q = keys[j]
+        if(scores[q].score < tenHighScore) {
+          console.log("it worked:" + q);
+          ref.child(q).remove();
+        }
+      }
+    }
+    window.location.replace('index.html');
+  }
+
 //play sound when page loads
 lose_sound.play();
 </script>
@@ -117,6 +135,6 @@ Top 10 Highscores:
 <div id='display'>
 
 </div>
-<input type="button" value="Try again?" onclick="window.location.replace('index.html')"/>
+<input type="button" value="Try again?" onclick="newPage()"/>
 </body>
 </html>
